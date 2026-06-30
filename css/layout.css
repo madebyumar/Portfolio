@@ -333,7 +333,7 @@
 	.section.started .st-title,
 	.section.started .typed-title,
 	.section.started .typed-cursor {
-		font-size: -1.08333333vw;
+		font-size: 8vw;
 		font-weight: 700;
 	}
 

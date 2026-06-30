@@ -11,12 +11,15 @@ $(function () {
 	$('.section.started').css({'height':height});
 	
 	/* Preloader */
-	$(window).on('load', function() {
+	function hidePreloader() {
+		if ($('body').hasClass('ready')) return;
 		$(".preloader .spinner").fadeOut(function(){
 			$('.preloader').fadeOut();
 			$('body').addClass('ready');
 		});
-	});
+	}
+	$(window).on('load', hidePreloader);
+	setTimeout(hidePreloader, 3000);
 
 	/* Fade animations on scroll */
 	if (width > 720) {
@@ -33,7 +36,9 @@ $(function () {
 	});
 
 	/* Youtube video background */
-	var myPlayer = $("#video-bg").YTPlayer();
+	if ($('#video-bg').length) {
+		$("#video-bg").YTPlayer();
+	}
 
 	/* Smoothscroll */
 	if($('.section.started').length) {
