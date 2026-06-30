@@ -577,6 +577,9 @@
 	display: block;
 	width: 100%;
 	height: auto;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	background: #0d0d0d;
 }
 
 .box-items .box-item .category {
@@ -783,6 +786,9 @@ footer .st-soc a:hover .icon {
 .popup-box .image img {
 	width: 100%;
 	height: auto;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	background: #0d0d0d;
 }
 
 .popup-box .desc {
