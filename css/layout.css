@@ -312,16 +312,22 @@
 	background-size: cover;
 }
 
+.section.started .st-title {
+	max-width: 100%;
+	padding: 0 24px;
+	box-sizing: border-box;
+}
+
 .section.started .st-title,
 .section.started .typed-title,
 .section.started .typed-cursor {
-	margin: 20px 0 10px 0;
-	font-size: 7.91666667vw;
+	margin: 20px auto 10px auto;
+	font-size: clamp(1.35rem, 4.5vw, 3.5rem);
 	font-family: 'Montserrat', helvetica;
-	line-height: 7.91666667vw;
+	line-height: 1.15;
 	color: #ffffff;
 	font-weight: 400;
-	letter-spacing: 0.1em;
+	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	transition: all 0.4s ease 0s;
 	-moz-transition: all 0.4s ease 0s;
@@ -329,12 +335,19 @@
 	-o-transition: all 0.4s ease 0s;
 }
 
+.section.started .typed-title {
+	display: block;
+	max-width: min(92vw, 1100px);
+	white-space: nowrap;
+}
+
 @media (max-width: 720px) {
 	.section.started .st-title,
 	.section.started .typed-title,
 	.section.started .typed-cursor {
-		font-size: 8vw;
+		font-size: clamp(1.1rem, 6vw, 2rem);
 		font-weight: 700;
+		letter-spacing: 0.04em;
 	}
 
 }

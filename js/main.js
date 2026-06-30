@@ -30,43 +30,55 @@ $(function () {
 	/* Typed subtitle */
 	$('.typed-title').typed({
 		stringsElement: $('.typing-title'),
-		backDelay: 5000,
-		typeSpeed: 0,
+		typeSpeed: 40,
+		backSpeed: 25,
+		backDelay: 1200,
+		startDelay: 400,
 		loop: true
 	});
 
-	/* Youtube video background */
-	if ($('#video-bg').length) {
-		$("#video-bg").YTPlayer();
-	}
+	/* Active nav highlight on scroll */
+	function updateActiveNav() {
+		var scrollPos = $(window).scrollTop() + 140;
 
-	/* Smoothscroll */
-	if($('.section.started').length) {
-		$(window).on('scroll', function(){
-			var scrollPos = $(window).scrollTop();
-			$('.top-menu ul li a').each(function () {
-				var currLink = $(this);
-				var refElement = $(currLink.attr("href"));
-				if (refElement.offset().top <= scrollPos) {
-					$('.top-menu ul li').removeClass("active");
-					currLink.closest('li').addClass("active");
-				}
-			});
+		if (scrollPos < height) {
+			$('.top-menu ul li').removeClass('active');
+			return;
+		}
+
+		var currentId = null;
+		$('.top-menu ul li a').each(function () {
+			var href = $(this).attr('href');
+			var $section = $(href);
+			if ($section.length && $section.offset().top <= scrollPos) {
+				currentId = href;
+			}
 		});
+
+		$('.top-menu ul li').removeClass('active');
+		if (currentId) {
+			$('.top-menu ul li a[href="' + currentId + '"]').closest('li').addClass('active');
+		}
 	}
 
-	/* Top Menu */
+	/* Smoothscroll + nav click */
 	if($('.section.started').length) {
 		$('.top-menu ul li a').on('click', function(){
 			var id = $(this).attr('href');
 			var h = parseFloat($(id).offset().top);
-			
+
 			$('body,html').animate({
 				scrollTop: h + 10
 			}, 800);
-			
+
+			$('.top-menu ul li').removeClass('active');
+			$(this).closest('li').addClass('active');
+
 			return false;
 		});
+
+		$(window).on('scroll', updateActiveNav);
+		updateActiveNav();
 	}
 
 	/* Open Top Menu */
@@ -90,13 +102,12 @@ $(function () {
 		if ($(this).scrollTop() <= height-10) {
 			$('.mouse-btn').fadeIn();
 		}
-		if ($(this).scrollTop() <= height-10) {
-			$('.top-menu ul li').removeClass("active");
-		}
 	});
 
-	/* Pause/Play video on scroll */
+	/* Youtube video background */
 	if ($('#video-bg').length) {
+		$("#video-bg").YTPlayer();
+
 		$(window).on('scroll', function() {
 			if ($(this).scrollTop() >= height-10) {
 				$('#video-bg').YTPPause();
