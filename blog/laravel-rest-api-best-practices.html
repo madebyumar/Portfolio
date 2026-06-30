@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Laravel REST API Best Practices for Production | Umar Shoaib Blog</title>
+	<meta name="description" content="Production-ready Laravel REST API best practices covering authentication, validation, versioning, error handling, and scalable architecture patterns." />
+	<meta name="author" content="Umar Shoaib" />
+	<meta name="robots" content="index, follow" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="canonical" href="https://www.umarshoaib.com/blog/laravel-rest-api-best-practices.html" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.umarshoaib.com/blog/laravel-rest-api-best-practices.html" />
+	<meta property="og:title" content="Laravel REST API Best Practices for Production" />
+	<meta property="og:description" content="Production-ready Laravel REST API best practices covering authentication, validation, versioning, error handling, and scalable architecture patterns." />
+	<meta property="og:image" content="https://www.umarshoaib.com/images/umar.jpeg" />
+	<meta property="article:published_time" content="2026-06-12" />
+	<meta property="article:author" content="Umar Shoaib" />
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		"headline": "Laravel REST API Best Practices for Production",
+		"description": "Production-ready Laravel REST API best practices covering authentication, validation, versioning, error handling, and scalable architecture patterns.",
+		"image": "https://www.umarshoaib.com/images/umar.jpeg",
+		"datePublished": "2026-06-12",
+		"dateModified": "2026-06-12",
+		"author": {
+			"@type": "Person",
+			"name": "Umar Shoaib",
+			"url": "https://www.umarshoaib.com/"
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": "Umar Shoaib"
+		},
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": "https://www.umarshoaib.com/blog/laravel-rest-api-best-practices.html"
+		}
+	}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css?family=Hind:300,400,500,600,700%7CMontserrat:400,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/basic.css" />
+	<link rel="stylesheet" href="../css/layout.css" />
+	<link rel="stylesheet" href="../css/blogs.css" />
+	<link rel="stylesheet" href="../css/blog-extras.css" />
+	<link rel="stylesheet" href="../css/ionicons.css" />
+	<link rel="shortcut icon" href="../images/favicons/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+	<div class="page">
+		<header class="header filled">
+			<div class="fw">
+				<div class="logo"><a href="../index.html" aria-label="Back to portfolio">U.</a></div>
+				<div class="top-menu" style="position:static;opacity:1;visibility:visible;background:transparent;padding:0;width:auto;height:auto;">
+					<ul>
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="index.html">Blog</a></li>
+						<li><a href="../index.html#contact-section">Contact</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<div class="container">
+			<div class="blog-page-header">
+				<a href="index.html">← All Blog Posts</a>
+				<h1>Laravel REST API Best Practices for Production</h1>
+				<p>Laravel · Backend · June 12, 2026</p>
+			</div>
+			<div class="section blog-post-page align-left" style="padding-top:0;">
+				<div class="fw">
+					<div class="blog-breadcrumb">
+						<a href="../index.html">Home</a> / <a href="index.html">Blog</a> / Laravel REST API Best Practices for Production
+					</div>
+					<div class="post-box">
+						<div class="blog-image"><img src="../images/blog/blog2.png" alt="Laravel REST API Best Practices for Production" loading="lazy" style="border-radius:12px;" /></div>
+						<div class="post-meta">Laravel · Backend · Published June 12, 2026 · By <a href="../index.html">Umar Shoaib</a></div>
+						<div class="post-content blog-content"><p>Building REST APIs with Laravel is straightforward, but shipping production-grade APIs requires discipline around architecture, security, and performance.</p>
+			<h2>API-First Design</h2>
+			<p>Start with clear resource definitions and consistent naming conventions. Use plural nouns for endpoints, proper HTTP verbs, and meaningful status codes. Document your API with tools like Postman or OpenAPI/Swagger.</p>
+			<h2>Authentication & Authorization</h2>
+			<p>Use Laravel Sanctum or Passport for token-based authentication. Implement role-based access control (RBAC) with policies and gates rather than scattering permission checks across controllers.</p>
+			<h2>Validation & Error Responses</h2>
+			<p>Always validate input using Form Request classes. Return consistent JSON error structures so frontend clients can handle failures predictably.</p>
+			<ul>
+				<li>Use API resources/transformers for consistent response shapes</li>
+				<li>Implement pagination for list endpoints</li>
+				<li>Add rate limiting via Laravel's throttle middleware</li>
+				<li>Version your API (<code>/api/v1/</code>) from day one</li>
+			</ul>
+			<h2>Performance Tips</h2>
+			<p>Eager load relationships to avoid N+1 queries, index frequently filtered columns, and use Redis for caching hot endpoints. Monitor query performance in production with Laravel Telescope or external APM tools.</p>
+							<p><strong>Need help with a similar project?</strong> <a href="mailto:contact@umarshoaib.com">contact@umarshoaib.com</a> · <a href="../index.html#contact-section">Get in touch</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<footer class="align-center">
+				<div class="copy">© 2026 Umar Shoaib — <a href="../index.html" style="color:inherit;">Portfolio</a> · <a href="index.html" style="color:inherit;">Blog</a></div>
+			</footer>
+		</div>
+	</div>
+</body>
+</html>

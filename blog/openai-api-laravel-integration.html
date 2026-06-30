@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Integrating OpenAI API in Laravel Applications | Umar Shoaib Blog</title>
+	<meta name="description" content="Learn how to integrate OpenAI API in Laravel for content generation, chatbots, and automation with secure API keys and clean service architecture." />
+	<meta name="author" content="Umar Shoaib" />
+	<meta name="robots" content="index, follow" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="canonical" href="https://www.umarshoaib.com/blog/openai-api-laravel-integration.html" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.umarshoaib.com/blog/openai-api-laravel-integration.html" />
+	<meta property="og:title" content="Integrating OpenAI API in Laravel Applications" />
+	<meta property="og:description" content="Learn how to integrate OpenAI API in Laravel for content generation, chatbots, and automation with secure API keys and clean service architecture." />
+	<meta property="og:image" content="https://www.umarshoaib.com/images/umar.jpeg" />
+	<meta property="article:published_time" content="2026-06-18" />
+	<meta property="article:author" content="Umar Shoaib" />
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		"headline": "Integrating OpenAI API in Laravel Applications",
+		"description": "Learn how to integrate OpenAI API in Laravel for content generation, chatbots, and automation with secure API keys and clean service architecture.",
+		"image": "https://www.umarshoaib.com/images/umar.jpeg",
+		"datePublished": "2026-06-18",
+		"dateModified": "2026-06-18",
+		"author": {
+			"@type": "Person",
+			"name": "Umar Shoaib",
+			"url": "https://www.umarshoaib.com/"
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": "Umar Shoaib"
+		},
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": "https://www.umarshoaib.com/blog/openai-api-laravel-integration.html"
+		}
+	}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css?family=Hind:300,400,500,600,700%7CMontserrat:400,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/basic.css" />
+	<link rel="stylesheet" href="../css/layout.css" />
+	<link rel="stylesheet" href="../css/blogs.css" />
+	<link rel="stylesheet" href="../css/blog-extras.css" />
+	<link rel="stylesheet" href="../css/ionicons.css" />
+	<link rel="shortcut icon" href="../images/favicons/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+	<div class="page">
+		<header class="header filled">
+			<div class="fw">
+				<div class="logo"><a href="../index.html" aria-label="Back to portfolio">U.</a></div>
+				<div class="top-menu" style="position:static;opacity:1;visibility:visible;background:transparent;padding:0;width:auto;height:auto;">
+					<ul>
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="index.html">Blog</a></li>
+						<li><a href="../index.html#contact-section">Contact</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<div class="container">
+			<div class="blog-page-header">
+				<a href="index.html">← All Blog Posts</a>
+				<h1>Integrating OpenAI API in Laravel Applications</h1>
+				<p>Laravel · AI · June 18, 2026</p>
+			</div>
+			<div class="section blog-post-page align-left" style="padding-top:0;">
+				<div class="fw">
+					<div class="blog-breadcrumb">
+						<a href="../index.html">Home</a> / <a href="index.html">Blog</a> / Integrating OpenAI API in Laravel Applications
+					</div>
+					<div class="post-box">
+						<div class="blog-image"><img src="../images/blog/blog1.jpg" alt="Integrating OpenAI API in Laravel Applications" loading="lazy" style="border-radius:12px;" /></div>
+						<div class="post-meta">Laravel · AI · Published June 18, 2026 · By <a href="../index.html">Umar Shoaib</a></div>
+						<div class="post-content blog-content"><p>OpenAI API integration in Laravel is one of the most requested features in modern web applications. From auto-generating product descriptions to building intelligent chatbots, Laravel provides an excellent foundation for AI-powered backends.</p>
+			<h2>Why Laravel for OpenAI Integration?</h2>
+			<p>Laravel's service container, configuration system, and queue workers make it ideal for OpenAI API calls. You can encapsulate API logic in dedicated service classes, keep controllers thin, and process long-running AI tasks asynchronously.</p>
+			<h2>Setting Up Secure API Keys</h2>
+			<p>Never hardcode your OpenAI API key. Store it in your <code>.env</code> file and reference it through <code>config/services.php</code>. Use Laravel's HTTP client to make requests with proper error handling and rate limiting.</p>
+			<h2>Building a Reusable AI Service</h2>
+			<p>Create an <code>OpenAIService</code> class that handles prompt construction, response parsing, and token management. This approach follows SOLID principles and makes your AI features testable and maintainable.</p>
+			<ul>
+				<li>Use form requests for input validation before sending prompts</li>
+				<li>Cache repeated queries to reduce API costs</li>
+				<li>Log failures and implement retry logic with exponential backoff</li>
+				<li>Queue heavy generation tasks using Laravel Horizon or database queues</li>
+			</ul>
+			<h2>Real-World Use Cases</h2>
+			<p>In production, I've used OpenAI API with Laravel for vehicle description generation, paraphrasing tools, and content automation via n8n workflows. Each implementation prioritized security, cost control, and user experience.</p>
+			<p>If you're building AI features into a Laravel app, start with a focused use case, measure token usage, and iterate based on real user feedback.</p>
+							<p><strong>Need help with a similar project?</strong> <a href="mailto:contact@umarshoaib.com">contact@umarshoaib.com</a> · <a href="../index.html#contact-section">Get in touch</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<footer class="align-center">
+				<div class="copy">© 2026 Umar Shoaib — <a href="../index.html" style="color:inherit;">Portfolio</a> · <a href="index.html" style="color:inherit;">Blog</a></div>
+			</footer>
+		</div>
+	</div>
+</body>
+</html>

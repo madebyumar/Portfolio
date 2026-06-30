@@ -1,0 +1,102 @@
+[
+  {
+    "slug": "openai-api-laravel-integration",
+    "title": "Integrating OpenAI API in Laravel Applications",
+    "description": "Learn how to integrate OpenAI API in Laravel for content generation, chatbots, and automation with secure API keys and clean service architecture.",
+    "tag": "Laravel · AI",
+    "date": "2026-06-18",
+    "dateDisplay": "June 18, 2026",
+    "image": "../images/blog/blog1.jpg",
+    "featured": true
+  },
+  {
+    "slug": "laravel-rest-api-best-practices",
+    "title": "Laravel REST API Best Practices for Production",
+    "description": "Production-ready Laravel REST API best practices covering authentication, validation, versioning, error handling, and scalable architecture patterns.",
+    "tag": "Laravel · Backend",
+    "date": "2026-06-12",
+    "dateDisplay": "June 12, 2026",
+    "image": "../images/blog/blog2.png",
+    "featured": true
+  },
+  {
+    "slug": "yolo-object-detection-guide",
+    "title": "YOLO Object Detection: A Practical Guide for Developers",
+    "description": "A practical YOLO object detection guide for developers covering model training, real-time inference, deployment on CPU/GPU, and computer vision project tips.",
+    "tag": "AI · Computer Vision",
+    "date": "2026-06-05",
+    "dateDisplay": "June 5, 2026",
+    "image": "../images/blog/blog3.png",
+    "featured": true
+  },
+  {
+    "slug": "mern-vs-laravel-backend-guide",
+    "title": "MERN Stack vs Laravel: Choosing the Right Backend",
+    "description": "Compare MERN stack vs Laravel for backend development. Learn when to choose Node.js/Express/MongoDB or Laravel/MySQL for your next web application.",
+    "tag": "Full-Stack",
+    "date": "2026-05-28",
+    "dateDisplay": "May 28, 2026",
+    "image": "../images/blog/blog1.jpg",
+    "featured": false
+  },
+  {
+    "slug": "deploy-flask-ml-api-production",
+    "title": "Deploying Flask ML APIs to Production",
+    "description": "Step-by-step guide to deploying Flask machine learning APIs to production with Gunicorn, Docker, environment config, and monitoring best practices.",
+    "tag": "Python · ML",
+    "date": "2026-05-20",
+    "dateDisplay": "May 20, 2026",
+    "image": "../images/blog/blog2.png",
+    "featured": false
+  },
+  {
+    "slug": "mysql-vs-postgresql-web-apps",
+    "title": "MySQL vs PostgreSQL for Web Applications",
+    "description": "MySQL vs PostgreSQL comparison for web developers. Learn which database to choose for Laravel, Node.js, and production web applications in 2026.",
+    "tag": "Databases",
+    "date": "2026-05-14",
+    "dateDisplay": "May 14, 2026",
+    "image": "../images/blog/blog3.png",
+    "featured": false
+  },
+  {
+    "slug": "python-llm-chatbot-tutorial",
+    "title": "Building AI Chatbots with Python and LLMs",
+    "description": "Build AI chatbots with Python and LLMs using OpenAI API, website crawling, semantic search, and Flask deployment for backend integration.",
+    "tag": "Python · AI",
+    "date": "2026-05-08",
+    "dateDisplay": "May 8, 2026",
+    "image": "../images/blog/blog1.jpg",
+    "featured": false
+  },
+  {
+    "slug": "laravel-role-based-access-control",
+    "title": "Role-Based Access Control in Laravel Explained",
+    "description": "Implement role-based access control in Laravel using policies, gates, middleware, and Spatie permissions for secure multi-role applications.",
+    "tag": "Laravel · Security",
+    "date": "2026-04-30",
+    "dateDisplay": "April 30, 2026",
+    "image": "../images/blog/blog2.png",
+    "featured": false
+  },
+  {
+    "slug": "n8n-automation-for-developers",
+    "title": "n8n Workflow Automation for Developers",
+    "description": "Use n8n workflow automation to connect APIs, automate data sync, integrate OpenAI, and reduce manual operations in Laravel and Node.js projects.",
+    "tag": "DevOps · Automation",
+    "date": "2026-04-22",
+    "dateDisplay": "April 22, 2026",
+    "image": "../images/blog/blog3.png",
+    "featured": false
+  },
+  {
+    "slug": "freelance-full-stack-developer-tips",
+    "title": "Freelance Full-Stack Developer: Lessons Learned",
+    "description": "Practical freelance full-stack developer tips on client communication, scoping projects, pricing, delivery, and building long-term remote client relationships.",
+    "tag": "Freelance · Career",
+    "date": "2026-04-15",
+    "dateDisplay": "April 15, 2026",
+    "image": "../images/blog/blog1.jpg",
+    "featured": false
+  }
+]

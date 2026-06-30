@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Deploying Flask ML APIs to Production | Umar Shoaib Blog</title>
+	<meta name="description" content="Step-by-step guide to deploying Flask machine learning APIs to production with Gunicorn, Docker, environment config, and monitoring best practices." />
+	<meta name="author" content="Umar Shoaib" />
+	<meta name="robots" content="index, follow" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="canonical" href="https://www.umarshoaib.com/blog/deploy-flask-ml-api-production.html" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="https://www.umarshoaib.com/blog/deploy-flask-ml-api-production.html" />
+	<meta property="og:title" content="Deploying Flask ML APIs to Production" />
+	<meta property="og:description" content="Step-by-step guide to deploying Flask machine learning APIs to production with Gunicorn, Docker, environment config, and monitoring best practices." />
+	<meta property="og:image" content="https://www.umarshoaib.com/images/umar.jpeg" />
+	<meta property="article:published_time" content="2026-05-20" />
+	<meta property="article:author" content="Umar Shoaib" />
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "BlogPosting",
+		"headline": "Deploying Flask ML APIs to Production",
+		"description": "Step-by-step guide to deploying Flask machine learning APIs to production with Gunicorn, Docker, environment config, and monitoring best practices.",
+		"image": "https://www.umarshoaib.com/images/umar.jpeg",
+		"datePublished": "2026-05-20",
+		"dateModified": "2026-05-20",
+		"author": {
+			"@type": "Person",
+			"name": "Umar Shoaib",
+			"url": "https://www.umarshoaib.com/"
+		},
+		"publisher": {
+			"@type": "Person",
+			"name": "Umar Shoaib"
+		},
+		"mainEntityOfPage": {
+			"@type": "WebPage",
+			"@id": "https://www.umarshoaib.com/blog/deploy-flask-ml-api-production.html"
+		}
+	}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css?family=Hind:300,400,500,600,700%7CMontserrat:400,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/basic.css" />
+	<link rel="stylesheet" href="../css/layout.css" />
+	<link rel="stylesheet" href="../css/blogs.css" />
+	<link rel="stylesheet" href="../css/blog-extras.css" />
+	<link rel="stylesheet" href="../css/ionicons.css" />
+	<link rel="shortcut icon" href="../images/favicons/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+	<div class="page">
+		<header class="header filled">
+			<div class="fw">
+				<div class="logo"><a href="../index.html" aria-label="Back to portfolio">U.</a></div>
+				<div class="top-menu" style="position:static;opacity:1;visibility:visible;background:transparent;padding:0;width:auto;height:auto;">
+					<ul>
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="index.html">Blog</a></li>
+						<li><a href="../index.html#contact-section">Contact</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<div class="container">
+			<div class="blog-page-header">
+				<a href="index.html">← All Blog Posts</a>
+				<h1>Deploying Flask ML APIs to Production</h1>
+				<p>Python · ML · May 20, 2026</p>
+			</div>
+			<div class="section blog-post-page align-left" style="padding-top:0;">
+				<div class="fw">
+					<div class="blog-breadcrumb">
+						<a href="../index.html">Home</a> / <a href="index.html">Blog</a> / Deploying Flask ML APIs to Production
+					</div>
+					<div class="post-box">
+						<div class="blog-image"><img src="../images/blog/blog2.png" alt="Deploying Flask ML APIs to Production" loading="lazy" style="border-radius:12px;" /></div>
+						<div class="post-meta">Python · ML · Published May 20, 2026 · By <a href="../index.html">Umar Shoaib</a></div>
+						<div class="post-content blog-content"><p>Flask is lightweight and perfect for serving machine learning models as REST APIs. Moving from a Jupyter notebook to a production Flask service requires attention to performance, security, and reliability.</p>
+			<h2>Production Server Setup</h2>
+			<p>Never use Flask's built-in development server in production. Deploy with Gunicorn or uWSGI behind Nginx as a reverse proxy. Containerize with Docker for consistent environments across staging and production.</p>
+			<h2>Model Loading Strategy</h2>
+			<p>Load ML models once at application startup, not on every request. Use lazy loading for large models and consider model versioning so you can roll back without downtime.</p>
+			<h2>API Design for ML</h2>
+			<ul>
+				<li>Validate input dimensions and data types strictly</li>
+				<li>Return confidence scores alongside predictions</li>
+				<li>Set request timeouts appropriate for inference time</li>
+				<li>Monitor latency, error rates, and model drift</li>
+			</ul>
+							<p><strong>Need help with a similar project?</strong> <a href="mailto:contact@umarshoaib.com">contact@umarshoaib.com</a> · <a href="../index.html#contact-section">Get in touch</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<footer class="align-center">
+				<div class="copy">© 2026 Umar Shoaib — <a href="../index.html" style="color:inherit;">Portfolio</a> · <a href="index.html" style="color:inherit;">Blog</a></div>
+			</footer>
+		</div>
+	</div>
+</body>
+</html>
