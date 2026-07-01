@@ -232,6 +232,11 @@ const posts = [
 	}
 ];
 
+posts.forEach((post) => {
+	post.image = `../images/blog/${post.slug}.svg`;
+	post.imageUrl = `${SITE}/images/blog/${post.slug}.svg`;
+});
+
 function postHtml(post) {
 	const canonical = `${SITE}/blog/${post.slug}.html`;
 	return `<!DOCTYPE html>
@@ -248,7 +253,7 @@ function postHtml(post) {
 	<meta property="og:url" content="${canonical}" />
 	<meta property="og:title" content="${post.title}" />
 	<meta property="og:description" content="${post.description}" />
-	<meta property="og:image" content="${SITE}/images/umar.jpeg" />
+	<meta property="og:image" content="${post.imageUrl}" />
 	<meta property="article:published_time" content="${post.date}" />
 	<meta property="article:author" content="Umar Shoaib" />
 	<script type="application/ld+json">
@@ -257,7 +262,7 @@ function postHtml(post) {
 		"@type": "BlogPosting",
 		"headline": "${post.title.replace(/"/g, '\\"')}",
 		"description": "${post.description.replace(/"/g, '\\"')}",
-		"image": "${SITE}/images/umar.jpeg",
+		"image": "${post.imageUrl}",
 		"datePublished": "${post.date}",
 		"dateModified": "${post.date}",
 		"author": {

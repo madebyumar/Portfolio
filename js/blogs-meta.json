@@ -6,7 +6,7 @@
     "tag": "Laravel · AI",
     "date": "2026-06-18",
     "dateDisplay": "June 18, 2026",
-    "image": "../images/blog/blog1.jpg",
+    "image": "../images/blog/openai-api-laravel-integration.svg",
     "featured": true
   },
   {
@@ -16,7 +16,7 @@
     "tag": "Laravel · Backend",
     "date": "2026-06-12",
     "dateDisplay": "June 12, 2026",
-    "image": "../images/blog/blog2.png",
+    "image": "../images/blog/laravel-rest-api-best-practices.svg",
     "featured": true
   },
   {
@@ -26,7 +26,7 @@
     "tag": "AI · Computer Vision",
     "date": "2026-06-05",
     "dateDisplay": "June 5, 2026",
-    "image": "../images/blog/blog3.png",
+    "image": "../images/blog/yolo-object-detection-guide.svg",
     "featured": true
   },
   {
@@ -36,7 +36,7 @@
     "tag": "Full-Stack",
     "date": "2026-05-28",
     "dateDisplay": "May 28, 2026",
-    "image": "../images/blog/blog1.jpg",
+    "image": "../images/blog/mern-vs-laravel-backend-guide.svg",
     "featured": false
   },
   {
@@ -46,7 +46,7 @@
     "tag": "Python · ML",
     "date": "2026-05-20",
     "dateDisplay": "May 20, 2026",
-    "image": "../images/blog/blog2.png",
+    "image": "../images/blog/deploy-flask-ml-api-production.svg",
     "featured": false
   },
   {
@@ -56,7 +56,7 @@
     "tag": "Databases",
     "date": "2026-05-14",
     "dateDisplay": "May 14, 2026",
-    "image": "../images/blog/blog3.png",
+    "image": "../images/blog/mysql-vs-postgresql-web-apps.svg",
     "featured": false
   },
   {
@@ -66,7 +66,7 @@
     "tag": "Python · AI",
     "date": "2026-05-08",
     "dateDisplay": "May 8, 2026",
-    "image": "../images/blog/blog1.jpg",
+    "image": "../images/blog/python-llm-chatbot-tutorial.svg",
     "featured": false
   },
   {
@@ -76,7 +76,7 @@
     "tag": "Laravel · Security",
     "date": "2026-04-30",
     "dateDisplay": "April 30, 2026",
-    "image": "../images/blog/blog2.png",
+    "image": "../images/blog/laravel-role-based-access-control.svg",
     "featured": false
   },
   {
@@ -86,7 +86,7 @@
     "tag": "DevOps · Automation",
     "date": "2026-04-22",
     "dateDisplay": "April 22, 2026",
-    "image": "../images/blog/blog3.png",
+    "image": "../images/blog/n8n-automation-for-developers.svg",
     "featured": false
   },
   {
@@ -96,7 +96,7 @@
     "tag": "Freelance · Career",
     "date": "2026-04-15",
     "dateDisplay": "April 15, 2026",
-    "image": "../images/blog/blog1.jpg",
+    "image": "../images/blog/freelance-full-stack-developer-tips.svg",
     "featured": false
   }
 ]
