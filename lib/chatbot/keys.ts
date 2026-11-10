@@ -34,12 +34,38 @@ function emptyVault(): ChatbotApiKeysVault {
   return { gemini: [], groq: [] }
 }
 
+function getEncryptionSecretCandidates(): Buffer[] {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const materials = [
+    process.env.CHATBOT_KEYS_SECRET?.trim(),
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+    // Stable app secret (preferred fallback — does not change when ADMIN_EMAILS changes)
+    `portfolio-chatbot-v2::${url}`,
+    // Legacy materials (keep so existing encrypted keys still decrypt)
+    `portfolio-chatbot::${process.env.ADMIN_EMAILS || 'dev'}::${url}`,
+    `portfolio-chatbot::contact@umarshoaib.com::${url}`,
+    `portfolio-chatbot::admin@umarshoaib.com::${url}`,
+    `portfolio-chatbot::admin@umarshoaib.com,contact@umarshoaib.com::${url}`,
+    `portfolio-chatbot::dev::${url}`,
+  ].filter((value): value is string => Boolean(value && value.trim()))
+
+  const unique: string[] = []
+  for (const material of materials) {
+    if (!unique.includes(material)) unique.push(material)
+  }
+  return unique.map((material) => createHash('sha256').update(material).digest())
+}
+
 function getEncryptionSecret(): Buffer {
-  const material =
-    process.env.CHATBOT_KEYS_SECRET?.trim() ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    `portfolio-chatbot::${process.env.ADMIN_EMAILS || 'dev'}::${process.env.NEXT_PUBLIC_SUPABASE_URL || ''}`
-  return createHash('sha256').update(material).digest()
+  return getEncryptionSecretCandidates()[0]
+}
+
+export function sanitizeApiKey(raw: string): string {
+  return raw
+    .trim()
+    .replace(/^["']|["']$/g, '')
+    .replace(/^Bearer\s+/i, '')
+    .replace(/\s+/g, '')
 }
 
 function encryptJson(payload: ChatbotApiKeysVault): { v: 1; iv: string; data: string } {
@@ -66,10 +92,18 @@ function decryptJson(blob: unknown): ChatbotApiKeysVault | null {
     if (packed.length < 17) return null
     const tag = packed.subarray(packed.length - 16)
     const encrypted = packed.subarray(0, packed.length - 16)
-    const decipher = createDecipheriv('aes-256-gcm', getEncryptionSecret(), iv)
-    decipher.setAuthTag(tag)
-    const json = Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8')
-    return normalizeVault(JSON.parse(json))
+
+    for (const secret of getEncryptionSecretCandidates()) {
+      try {
+        const decipher = createDecipheriv('aes-256-gcm', secret, iv)
+        decipher.setAuthTag(tag)
+        const json = Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8')
+        return normalizeVault(JSON.parse(json))
+      } catch {
+        // try next secret material
+      }
+    }
+    return null
   } catch {
     return null
   }
@@ -90,7 +124,7 @@ function normalizeKeyList(value: unknown): ProviderApiKey[] {
   for (const item of value) {
     if (!item || typeof item !== 'object' || Array.isArray(item)) continue
     const row = item as Record<string, unknown>
-    const key = typeof row.key === 'string' ? row.key.trim() : ''
+    const key = typeof row.key === 'string' ? sanitizeApiKey(row.key) : ''
     if (!key) continue
     out.push({
       id:
@@ -257,7 +291,7 @@ function mergeKeyList(
         ? row.id.trim()
         : `k-${randomBytes(6).toString('hex')}`
     const prev = byId.get(id)
-    const incomingKey = typeof row.key === 'string' ? row.key.trim() : ''
+    const incomingKey = typeof row.key === 'string' ? sanitizeApiKey(row.key) : ''
     const keepPrevious = !incomingKey && Boolean(prev?.key) && row.clear !== true
     const key = incomingKey || (keepPrevious ? prev!.key : '')
     if (!key) continue

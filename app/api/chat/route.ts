@@ -128,10 +128,17 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Chat request failed:', error)
-    const message =
-      error instanceof Error && error.message.includes('API key')
-        ? 'Chat is not configured yet. Add Gemini or Groq API keys in environment variables.'
-        : 'Unable to answer right now. Please try again or use the contact form.'
+    const raw = error instanceof Error ? error.message : ''
+    let message = 'Unable to answer right now. Please try again or use the contact form.'
+    if (/no API keys configured/i.test(raw)) {
+      message =
+        'Chat is not configured yet. Add Gemini or Groq API keys in Admin → Chatbot, then Save API keys.'
+    } else if (/api key|invalid_api_key|unauthorized|PERMISSION_DENIED|401|403/i.test(raw)) {
+      message =
+        'Your AI API key was rejected. In Admin → Chatbot, paste a valid Gemini key from Google AI Studio (usually starts with AIza) with no HTTP referrer restrictions, then Save.'
+    } else if (/rate limit|429|quota|resource_exhausted/i.test(raw)) {
+      message = 'AI provider rate limit/quota hit. Add another key in Admin → Chatbot or try again shortly.'
+    }
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
