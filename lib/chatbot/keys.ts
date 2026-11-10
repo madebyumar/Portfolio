@@ -1,6 +1,18 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto'
+import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/env'
 import type { ChatProvider } from '@/lib/chatbot/types'
+
+function normalizeSupabaseUrl(url: string): string {
+  return url.trim().replace(/\/$/, '')
+}
+
+function createPublicSettingsClient() {
+  return createSupabaseJsClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
+}
 
 export interface ProviderApiKey {
   id: string
@@ -35,18 +47,23 @@ function emptyVault(): ChatbotApiKeysVault {
 }
 
 function getEncryptionSecretCandidates(): Buffer[] {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const url = normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL || '')
+  const urlRaw = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
   const materials = [
     process.env.CHATBOT_KEYS_SECRET?.trim(),
     process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
     // Stable app secret (preferred fallback — does not change when ADMIN_EMAILS changes)
     `portfolio-chatbot-v2::${url}`,
+    urlRaw && urlRaw !== url ? `portfolio-chatbot-v2::${urlRaw}` : '',
     // Legacy materials (keep so existing encrypted keys still decrypt)
     `portfolio-chatbot::${process.env.ADMIN_EMAILS || 'dev'}::${url}`,
     `portfolio-chatbot::contact@umarshoaib.com::${url}`,
     `portfolio-chatbot::admin@umarshoaib.com::${url}`,
     `portfolio-chatbot::admin@umarshoaib.com,contact@umarshoaib.com::${url}`,
     `portfolio-chatbot::dev::${url}`,
+    urlRaw
+      ? `portfolio-chatbot::contact@umarshoaib.com::${urlRaw}`
+      : '',
   ].filter((value): value is string => Boolean(value && value.trim()))
 
   const unique: string[] = []
@@ -200,16 +217,26 @@ export function getEnvProviderKeys(provider: ChatProvider): string[] {
 
 export async function loadChatbotApiKeysVault(): Promise<ChatbotApiKeysVault> {
   try {
-    const supabase = await createClient()
+    // Use a cookie-free client so public chat can always read the encrypted vault.
+    const supabase = createPublicSettingsClient()
     const { data, error } = await supabase
       .from('site_settings')
       .select('value')
       .eq('key', SETTINGS_KEY)
       .maybeSingle()
 
-    if (error || !data?.value) return emptyVault()
-    return decryptJson(data.value) || emptyVault()
-  } catch {
+    if (error || !data?.value) {
+      console.error('Chatbot keys load failed:', error?.message || 'missing row')
+      return emptyVault()
+    }
+    const vault = decryptJson(data.value)
+    if (!vault) {
+      console.error('Chatbot keys decrypt failed — re-save keys in Admin → Chatbot')
+      return emptyVault()
+    }
+    return vault
+  } catch (error) {
+    console.error('Chatbot keys load exception:', error)
     return emptyVault()
   }
 }

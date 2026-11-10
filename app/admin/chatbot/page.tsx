@@ -392,6 +392,7 @@ export default function AdminChatbotPage() {
               <p style={{ margin: '0 0 16px', fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', fontFamily: 'IBM Plex Mono, monospace', lineHeight: 1.5 }}>
                 Add up to 20 Gemini and 20 Groq keys here. If one key hits a rate limit or fails, the next key is tried, then the other provider.
                 Keys are encrypted at rest. Leave a key field blank to keep the existing secret.
+                Tip: if a Gemini key starts with AQ. and chat fails, also add a free Groq key from console.groq.com — some new Gemini auth keys are currently rejected by Google.
               </p>
 
               <KeyListEditor
