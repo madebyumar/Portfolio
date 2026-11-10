@@ -1,0 +1,14 @@
+node_modules
+.npm-cache
+.next
+out
+.env*
+!.env.example
+npm-debug.log*
+*.log
+*.pid
+*.tsbuildinfo
+
+.netlify
+.vercel
+
