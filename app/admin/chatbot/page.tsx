@@ -40,13 +40,49 @@ interface MessageRow {
 
 type Tab = 'settings' | 'conversations'
 
+interface EditableApiKey {
+  id: string
+  label: string
+  keyInput: string
+  keyMasked: string
+  hasKey: boolean
+  enabled: boolean
+  isNew?: boolean
+}
+
+interface KeyStatus {
+  geminiConfigured: boolean
+  groqConfigured: boolean
+  geminiCount: number
+  groqCount: number
+  geminiAdminCount: number
+  groqAdminCount: number
+  geminiEnvCount: number
+  groqEnvCount: number
+}
+
+function newEditableKey(labelPrefix: string): EditableApiKey {
+  return {
+    id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    label: labelPrefix,
+    keyInput: '',
+    keyMasked: '',
+    hasKey: false,
+    enabled: true,
+    isNew: true,
+  }
+}
+
 export default function AdminChatbotPage() {
   const [tab, setTab] = useState<Tab>('settings')
   const [settings, setSettings] = useState<ChatbotSettings>({ ...DEFAULT_CHATBOT_SETTINGS })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingKeys, setSavingKeys] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
-  const [keyStatus, setKeyStatus] = useState<{ geminiConfigured: boolean; groqConfigured: boolean } | null>(null)
+  const [keyStatus, setKeyStatus] = useState<KeyStatus | null>(null)
+  const [geminiKeys, setGeminiKeys] = useState<EditableApiKey[]>([])
+  const [groqKeys, setGroqKeys] = useState<EditableApiKey[]>([])
 
   const [conversations, setConversations] = useState<ConversationRow[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -55,15 +91,35 @@ export default function AdminChatbotPage() {
 
   const supabase = useMemo(() => createClient(), [])
 
+  const mapMaskedKeys = (
+    list: Array<{ id: string; label: string; keyMasked: string; enabled: boolean; hasKey: boolean }> | undefined,
+    fallbackLabel: string
+  ): EditableApiKey[] => {
+    if (!list || list.length === 0) return []
+    return list.map((item, index) => ({
+      id: item.id,
+      label: item.label || `${fallbackLabel} ${index + 1}`,
+      keyInput: '',
+      keyMasked: item.keyMasked,
+      hasKey: item.hasKey,
+      enabled: item.enabled,
+    }))
+  }
+
   const loadSettings = useCallback(async () => {
     setLoading(true)
-    const [{ data }, statusRes] = await Promise.all([
+    const [{ data }, statusRes, keysRes] = await Promise.all([
       supabase.from('site_settings').select('value').eq('key', 'chatbot').single(),
       fetch('/api/admin/chatbot/status').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('/api/admin/chatbot/keys').then((r) => (r.ok ? r.json() : null)).catch(() => null),
     ])
 
     if (data?.value) setSettings(asChatbotSettings(data.value))
-    if (statusRes) setKeyStatus(statusRes)
+    if (statusRes) setKeyStatus(statusRes as KeyStatus)
+    if (keysRes?.keys) {
+      setGeminiKeys(mapMaskedKeys(keysRes.keys.gemini, 'Gemini'))
+      setGroqKeys(mapMaskedKeys(keysRes.keys.groq, 'Groq'))
+    }
     setLoading(false)
   }, [supabase])
 
@@ -163,6 +219,70 @@ export default function AdminChatbotPage() {
     setSettings({ ...settings, primaryProvider })
   }
 
+  const updateKeyRow = (
+    provider: 'gemini' | 'groq',
+    id: string,
+    patch: Partial<EditableApiKey>
+  ) => {
+    const setter = provider === 'gemini' ? setGeminiKeys : setGroqKeys
+    setter((prev) => prev.map((row) => (row.id === id ? { ...row, ...patch } : row)))
+  }
+
+  const removeKeyRow = (provider: 'gemini' | 'groq', id: string) => {
+    const setter = provider === 'gemini' ? setGeminiKeys : setGroqKeys
+    setter((prev) => prev.filter((row) => row.id !== id))
+  }
+
+  const addKeyRow = (provider: 'gemini' | 'groq') => {
+    const setter = provider === 'gemini' ? setGeminiKeys : setGroqKeys
+    const label = provider === 'gemini' ? 'Gemini' : 'Groq'
+    setter((prev) => {
+      if (prev.length >= 20) return prev
+      return [...prev, newEditableKey(`${label} ${prev.length + 1}`)]
+    })
+  }
+
+  const handleSaveKeys = async () => {
+    setSavingKeys(true)
+    setMessage(null)
+
+    const serialize = (rows: EditableApiKey[]) =>
+      rows.map((row) => ({
+        id: row.isNew ? undefined : row.id,
+        label: row.label,
+        enabled: row.enabled,
+        key: row.keyInput.trim() || undefined,
+        clear: row.isNew ? true : undefined,
+      }))
+
+    try {
+      const res = await fetch('/api/admin/chatbot/keys', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gemini: serialize(geminiKeys),
+          groq: serialize(groqKeys),
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setMessage({ text: data.error || 'Unable to save API keys', type: 'error' })
+      } else {
+        setGeminiKeys(mapMaskedKeys(data.keys?.gemini, 'Gemini'))
+        setGroqKeys(mapMaskedKeys(data.keys?.groq, 'Groq'))
+        const statusRes = await fetch('/api/admin/chatbot/status').then((r) => (r.ok ? r.json() : null))
+        if (statusRes) setKeyStatus(statusRes as KeyStatus)
+        setMessage({
+          text: 'API keys saved. Chatbot will rotate through them automatically on failures.',
+          type: 'success',
+        })
+      }
+    } catch {
+      setMessage({ text: 'Unable to save API keys', type: 'error' })
+    }
+    setSavingKeys(false)
+  }
+
   return (
     <div suppressHydrationWarning style={{ maxWidth: '980px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
@@ -255,23 +375,56 @@ export default function AdminChatbotPage() {
             <section style={cardStyle}>
               <div style={sectionHead}>
                 <KeyRound size={16} color="#d4ff3f" />
-                <h2 style={sectionTitle}>Providers (Gemini → Groq backup)</h2>
+                <h2 style={sectionTitle}>API keys (multi-key fallback)</h2>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <StatusPill
-                  label="Gemini key"
+                  label="Gemini"
                   ok={Boolean(keyStatus?.geminiConfigured)}
-                  hint="GOOGLE_GENERATIVE_AI_API_KEY or GEMINI_API_KEY"
+                  hint={`${keyStatus?.geminiCount ?? 0} active · admin ${keyStatus?.geminiAdminCount ?? 0} · env ${keyStatus?.geminiEnvCount ?? 0}`}
                 />
                 <StatusPill
-                  label="Groq key"
+                  label="Groq"
                   ok={Boolean(keyStatus?.groqConfigured)}
-                  hint="GROQ_API_KEY"
+                  hint={`${keyStatus?.groqCount ?? 0} active · admin ${keyStatus?.groqAdminCount ?? 0} · env ${keyStatus?.groqEnvCount ?? 0}`}
                 />
               </div>
-              <p style={{ margin: '0 0 14px', fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', fontFamily: 'IBM Plex Mono, monospace' }}>
-                API keys stay in Vercel / local env vars (never stored in the database). Configure models and fallback here.
+              <p style={{ margin: '0 0 16px', fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', fontFamily: 'IBM Plex Mono, monospace', lineHeight: 1.5 }}>
+                Add up to 20 Gemini and 20 Groq keys here. If one key hits a rate limit or fails, the next key is tried, then the other provider.
+                Keys are encrypted at rest. Leave a key field blank to keep the existing secret.
               </p>
+
+              <KeyListEditor
+                title="Gemini API keys"
+                rows={geminiKeys}
+                onChange={(id, patch) => updateKeyRow('gemini', id, patch)}
+                onRemove={(id) => removeKeyRow('gemini', id)}
+                onAdd={() => addKeyRow('gemini')}
+                placeholder="AIza..."
+              />
+              <div style={{ height: '16px' }} />
+              <KeyListEditor
+                title="Groq API keys"
+                rows={groqKeys}
+                onChange={(id, patch) => updateKeyRow('groq', id, patch)}
+                onRemove={(id) => removeKeyRow('groq', id)}
+                onAdd={() => addKeyRow('groq')}
+                placeholder="gsk_..."
+              />
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+                <button type="button" onClick={() => void handleSaveKeys()} disabled={savingKeys} style={primaryBtn}>
+                  <Save size={16} />
+                  <span>{savingKeys ? 'Saving keys…' : 'Save API keys'}</span>
+                </button>
+              </div>
+            </section>
+
+            <section style={cardStyle}>
+              <div style={sectionHead}>
+                <Bot size={16} color="#d4ff3f" />
+                <h2 style={sectionTitle}>Provider routing</h2>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div>
                   <label style={labelStyle}>PRIMARY PROVIDER</label>
@@ -285,14 +438,14 @@ export default function AdminChatbotPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>FALLBACK</label>
+                  <label style={labelStyle}>PROVIDER FALLBACK</label>
                   <label style={{ ...toggleRow, marginTop: '10px' }}>
                     <input
                       type="checkbox"
                       checked={settings.fallbackEnabled}
                       onChange={(e) => setSettings({ ...settings, fallbackEnabled: e.target.checked })}
                     />
-                    <span>Auto-switch to the other provider on rate limits / errors</span>
+                    <span>Switch provider after all its keys fail</span>
                   </label>
                 </div>
                 <div>
@@ -538,6 +691,82 @@ function StatusPill({ label, ok, hint }: { label: string; ok: boolean; hint: str
       <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', marginTop: '4px', fontFamily: 'IBM Plex Mono, monospace' }}>
         {hint}
       </div>
+    </div>
+  )
+}
+
+function KeyListEditor({
+  title,
+  rows,
+  onChange,
+  onRemove,
+  onAdd,
+  placeholder,
+}: {
+  title: string
+  rows: EditableApiKey[]
+  onChange: (id: string, patch: Partial<EditableApiKey>) => void
+  onRemove: (id: string) => void
+  onAdd: () => void
+  placeholder: string
+}) {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <label style={{ ...labelStyle, marginBottom: 0 }}>{title.toUpperCase()}</label>
+        <button type="button" onClick={onAdd} disabled={rows.length >= 20} style={{ ...ghostBtn, padding: '6px 10px' }}>
+          + Add key
+        </button>
+      </div>
+      {rows.length === 0 ? (
+        <div style={{ padding: '14px', border: '1px dashed rgba(255,255,255,0.12)', borderRadius: '6px', color: 'rgba(255,255,255,0.4)', fontSize: '12.5px' }}>
+          No keys yet. Click “Add key” to paste one from Google AI Studio or Groq.
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gap: '10px' }}>
+          {rows.map((row, index) => (
+            <div
+              key={row.id}
+              style={{
+                background: '#0a0a08',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                padding: '12px',
+                display: 'grid',
+                gap: '8px',
+              }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '8px', alignItems: 'center' }}>
+                <input
+                  value={row.label}
+                  onChange={(e) => onChange(row.id, { label: e.target.value })}
+                  style={inputStyle}
+                  placeholder={`Key ${index + 1}`}
+                />
+                <label style={{ ...toggleRow, margin: 0, fontSize: '12px' }}>
+                  <input
+                    type="checkbox"
+                    checked={row.enabled}
+                    onChange={(e) => onChange(row.id, { enabled: e.target.checked })}
+                  />
+                  On
+                </label>
+                <button type="button" onClick={() => onRemove(row.id)} style={{ ...ghostBtn, padding: '8px 10px', color: '#ff8f8f' }}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              <input
+                type="password"
+                value={row.keyInput}
+                onChange={(e) => onChange(row.id, { keyInput: e.target.value })}
+                style={inputStyle}
+                placeholder={row.hasKey ? `Saved: ${row.keyMasked} (leave blank to keep)` : placeholder}
+                autoComplete="off"
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

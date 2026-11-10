@@ -1,23 +1,11 @@
 import { generateText } from 'ai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createGroq } from '@ai-sdk/groq'
+import { getProviderApiKeys, getProviderKeyCounts } from '@/lib/chatbot/keys'
 import type { ChatMessage, ChatProvider, ChatbotSettings } from '@/lib/chatbot/types'
 
-export function getProviderKeyStatus() {
-  return {
-    geminiConfigured: Boolean(
-      process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() || process.env.GEMINI_API_KEY?.trim()
-    ),
-    groqConfigured: Boolean(process.env.GROQ_API_KEY?.trim()),
-  }
-}
-
-function geminiApiKey(): string | null {
-  return process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() || process.env.GEMINI_API_KEY?.trim() || null
-}
-
-function groqApiKey(): string | null {
-  return process.env.GROQ_API_KEY?.trim() || null
+export async function getProviderKeyStatus() {
+  return getProviderKeyCounts()
 }
 
 function providerOrder(settings: ChatbotSettings): ChatProvider[] {
@@ -31,21 +19,21 @@ function isRetryableError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return true
   const err = error as { statusCode?: number; status?: number; message?: string }
   const code = err.statusCode ?? err.status
-  if (code === 400 || code === 401 || code === 403) return false
+  // Bad request / content policy — don't burn more keys
+  if (code === 400) return false
   const message = (err.message || '').toLowerCase()
-  if (message.includes('api key') || message.includes('invalid_api_key')) return false
+  if (message.includes('safety') || message.includes('blocked')) return false
   return true
 }
 
-async function generateWithProvider(
+async function generateWithProviderKey(
   provider: ChatProvider,
+  apiKey: string,
   settings: ChatbotSettings,
   system: string,
   messages: ChatMessage[]
 ): Promise<string> {
   if (provider === 'gemini') {
-    const apiKey = geminiApiKey()
-    if (!apiKey) throw new Error('Gemini API key is not configured')
     const google = createGoogleGenerativeAI({ apiKey })
     const result = await generateText({
       model: google(settings.geminiModel),
@@ -57,8 +45,6 @@ async function generateWithProvider(
     return result.text.trim()
   }
 
-  const apiKey = groqApiKey()
-  if (!apiKey) throw new Error('Groq API key is not configured')
   const groq = createGroq({ apiKey })
   const result = await generateText({
     model: groq(settings.groqModel),
@@ -80,26 +66,30 @@ export async function generateChatReply(params: {
 
   for (let i = 0; i < order.length; i++) {
     const provider = order[i]
-    const status = getProviderKeyStatus()
-    if (provider === 'gemini' && !status.geminiConfigured) {
-      errors.push('Gemini key missing')
-      continue
-    }
-    if (provider === 'groq' && !status.groqConfigured) {
-      errors.push('Groq key missing')
+    const keys = await getProviderApiKeys(provider)
+    if (keys.length === 0) {
+      errors.push(`${provider}: no API keys configured`)
       continue
     }
 
-    try {
-      const text = await generateWithProvider(provider, params.settings, params.system, params.messages)
-      if (!text) throw new Error('Empty model response')
-      return { text, provider }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown provider error'
-      errors.push(`${provider}: ${message}`)
-      const hasNext = i < order.length - 1
-      if (!hasNext || !isRetryableError(error)) {
-        break
+    for (let k = 0; k < keys.length; k++) {
+      try {
+        const text = await generateWithProviderKey(
+          provider,
+          keys[k],
+          params.settings,
+          params.system,
+          params.messages
+        )
+        if (!text) throw new Error('Empty model response')
+        return { text, provider }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown provider error'
+        errors.push(`${provider}[key ${k + 1}/${keys.length}]: ${message}`)
+        if (!isRetryableError(error)) {
+          // Stop this provider's remaining keys on hard failures
+          break
+        }
       }
     }
   }

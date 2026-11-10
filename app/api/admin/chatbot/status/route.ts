@@ -15,5 +15,6 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  return NextResponse.json(getProviderKeyStatus())
+  const status = await getProviderKeyStatus()
+  return NextResponse.json(status)
 }
