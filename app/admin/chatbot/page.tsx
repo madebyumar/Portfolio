@@ -392,7 +392,8 @@ export default function AdminChatbotPage() {
               <p style={{ margin: '0 0 16px', fontSize: '12.5px', color: 'rgba(255,255,255,0.45)', fontFamily: 'IBM Plex Mono, monospace', lineHeight: 1.5 }}>
                 Add up to 20 Gemini and 20 Groq keys here. If one key hits a rate limit or fails, the next key is tried, then the other provider.
                 Keys are encrypted at rest. Leave a key field blank to keep the existing secret.
-                Tip: if a Gemini key starts with AQ. and chat fails, also add a free Groq key from console.groq.com — some new Gemini auth keys are currently rejected by Google.
+                Google AI Studio keys are supported in both formats: legacy AIza… and new AQ.… authorization keys.
+                If an AQ. key is rejected by Google (invalid / not provisioned), create a fresh key in AI Studio or add a free Groq key from console.groq.com as backup.
               </p>
 
               <KeyListEditor
@@ -401,7 +402,7 @@ export default function AdminChatbotPage() {
                 onChange={(id, patch) => updateKeyRow('gemini', id, patch)}
                 onRemove={(id) => removeKeyRow('gemini', id)}
                 onAdd={() => addKeyRow('gemini')}
-                placeholder="AIza..."
+                placeholder="AIza… or AQ.…"
               />
               <div style={{ height: '16px' }} />
               <KeyListEditor
@@ -455,7 +456,7 @@ export default function AdminChatbotPage() {
                     value={settings.geminiModel}
                     onChange={(e) => setSettings({ ...settings, geminiModel: e.target.value })}
                     style={inputStyle}
-                    placeholder="gemini-2.0-flash"
+                    placeholder="gemini-3.6-flash"
                   />
                 </div>
                 <div>

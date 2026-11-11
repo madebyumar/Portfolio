@@ -133,12 +133,12 @@ export async function POST(request: Request) {
     if (/no API keys configured/i.test(raw)) {
       message =
         'Chat is not configured yet. Add Gemini or Groq API keys in Admin → Chatbot, then Save API keys.'
-    } else if (/ACCESS_TOKEN_TYPE_UNSUPPORTED/i.test(raw)) {
+    } else if (/ACCESS_TOKEN_TYPE_UNSUPPORTED|Invalid Auth key/i.test(raw)) {
       message =
-        'This Gemini key type (AQ.… auth key) is not accepted by the Gemini API yet. Create a new key in Google AI Studio, or add a Groq key in Admin → Chatbot as backup.'
+        'Your Google AI Studio AQ.… key was rejected by Google (invalid or not provisioned yet). Create a new key in AI Studio, paste it in Admin → Chatbot, or add a Groq key as backup.'
     } else if (/api key|invalid_api_key|unauthorized|PERMISSION_DENIED|401|403/i.test(raw)) {
       message =
-        'Your AI API key was rejected by the provider. In Admin → Chatbot, replace it with a working Gemini or Groq key, then Save API keys.'
+        'Your AI API key was rejected by the provider. In Admin → Chatbot, replace it with a working Gemini (AIza… or AQ.…) or Groq key, then Save API keys.'
     } else if (/rate limit|429|quota|resource_exhausted/i.test(raw)) {
       message = 'AI provider rate limit/quota hit. Add another key in Admin → Chatbot or try again shortly.'
     }

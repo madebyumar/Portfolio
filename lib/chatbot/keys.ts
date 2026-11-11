@@ -46,24 +46,31 @@ function emptyVault(): ChatbotApiKeysVault {
   return { gemini: [], groq: [] }
 }
 
+/** Stable secret that does not depend on env URL / service role (avoids prod decrypt misses). */
+const STABLE_CHATBOT_SECRET = 'portfolio-chatbot-v3'
+
 function getEncryptionSecretCandidates(): Buffer[] {
-  const url = normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL || '')
-  const urlRaw = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
+  const url = normalizeSupabaseUrl(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || ''
+  )
+  const urlRaw = (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '').trim()
+  // Prefer stable secrets for encrypt+decrypt. Keep service-role last (decrypt only legacy).
   const materials = [
     process.env.CHATBOT_KEYS_SECRET?.trim(),
-    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+    STABLE_CHATBOT_SECRET,
     // Stable app secret (preferred fallback — does not change when ADMIN_EMAILS changes)
-    `portfolio-chatbot-v2::${url}`,
+    url ? `portfolio-chatbot-v2::${url}` : '',
     urlRaw && urlRaw !== url ? `portfolio-chatbot-v2::${urlRaw}` : '',
+    // Known project URL fallback (covers misconfigured NEXT_PUBLIC_SUPABASE_URL on host)
+    'portfolio-chatbot-v2::https://sewhmngpysjtxpjndkaq.supabase.co',
     // Legacy materials (keep so existing encrypted keys still decrypt)
-    `portfolio-chatbot::${process.env.ADMIN_EMAILS || 'dev'}::${url}`,
-    `portfolio-chatbot::contact@umarshoaib.com::${url}`,
-    `portfolio-chatbot::admin@umarshoaib.com::${url}`,
-    `portfolio-chatbot::admin@umarshoaib.com,contact@umarshoaib.com::${url}`,
-    `portfolio-chatbot::dev::${url}`,
-    urlRaw
-      ? `portfolio-chatbot::contact@umarshoaib.com::${urlRaw}`
-      : '',
+    url ? `portfolio-chatbot::${process.env.ADMIN_EMAILS || 'dev'}::${url}` : '',
+    url ? `portfolio-chatbot::contact@umarshoaib.com::${url}` : '',
+    url ? `portfolio-chatbot::admin@umarshoaib.com::${url}` : '',
+    url ? `portfolio-chatbot::admin@umarshoaib.com,contact@umarshoaib.com::${url}` : '',
+    url ? `portfolio-chatbot::dev::${url}` : '',
+    urlRaw ? `portfolio-chatbot::contact@umarshoaib.com::${urlRaw}` : '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
   ].filter((value): value is string => Boolean(value && value.trim()))
 
   const unique: string[] = []
@@ -74,7 +81,12 @@ function getEncryptionSecretCandidates(): Buffer[] {
 }
 
 function getEncryptionSecret(): Buffer {
-  return getEncryptionSecretCandidates()[0]
+  // Always encrypt with CHATBOT_KEYS_SECRET or stable v3 — never with rotating service-role key.
+  const preferred = [
+    process.env.CHATBOT_KEYS_SECRET?.trim(),
+    STABLE_CHATBOT_SECRET,
+  ].filter((value): value is string => Boolean(value && value.trim()))
+  return createHash('sha256').update(preferred[0]).digest()
 }
 
 export function sanitizeApiKey(raw: string): string {
@@ -99,9 +111,18 @@ function encryptJson(payload: ChatbotApiKeysVault): { v: 1; iv: string; data: st
 }
 
 function decryptJson(blob: unknown): ChatbotApiKeysVault | null {
-  if (!blob || typeof blob !== 'object' || Array.isArray(blob)) return null
-  const raw = blob as Record<string, unknown>
-  if (raw.v !== 1 || typeof raw.iv !== 'string' || typeof raw.data !== 'string') return null
+  let rawInput: unknown = blob
+  if (typeof rawInput === 'string') {
+    try {
+      rawInput = JSON.parse(rawInput)
+    } catch {
+      return null
+    }
+  }
+  if (!rawInput || typeof rawInput !== 'object' || Array.isArray(rawInput)) return null
+  const raw = rawInput as Record<string, unknown>
+  const version = typeof raw.v === 'number' ? raw.v : Number(raw.v)
+  if (version !== 1 || typeof raw.iv !== 'string' || typeof raw.data !== 'string') return null
 
   try {
     const iv = Buffer.from(raw.iv, 'base64')
@@ -152,7 +173,7 @@ function normalizeKeyList(value: unknown): ProviderApiKey[] {
         typeof row.label === 'string' && row.label.trim()
           ? row.label.trim().slice(0, 60)
           : `Key ${out.length + 1}`,
-      key: key.slice(0, 200),
+      key: key.slice(0, 512),
       enabled: row.enabled !== false,
     })
     if (out.length >= MAX_KEYS_PER_PROVIDER) break
@@ -329,7 +350,7 @@ function mergeKeyList(
         typeof row.label === 'string' && row.label.trim()
           ? row.label.trim().slice(0, 60)
           : prev?.label || `Key ${next.length + 1}`,
-      key: key.slice(0, 200),
+      key: key.slice(0, 512),
       enabled: row.enabled !== false,
     })
     if (next.length >= MAX_KEYS_PER_PROVIDER) break

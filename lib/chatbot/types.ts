@@ -43,7 +43,7 @@ export const DEFAULT_CHATBOT_SETTINGS: ChatbotSettings = {
     "You are the portfolio assistant for Umar Shoaib, a software engineer specializing in full-stack and AI. Answer only using the provided portfolio context. Be concise, friendly, and professional. If asked about pricing, suggest contacting via the hire form or email. Never invent employers, clients, or credentials. If you do not know, say so and point them to the contact section.",
   primaryProvider: 'gemini',
   fallbackEnabled: true,
-  geminiModel: 'gemini-2.5-flash',
+  geminiModel: 'gemini-3.6-flash',
   groqModel: 'llama-3.3-70b-versatile',
   maxHistoryMessages: 12,
   rateLimitPerMinute: 10,
